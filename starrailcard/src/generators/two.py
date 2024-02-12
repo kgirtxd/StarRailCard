@@ -24,7 +24,7 @@ async def bg_element(name):
         return _of.bg_imaginary.copy()
     else:
         return _of.bg_psyhical.copy()
-    
+
 async def bg_relic_element(name):
     if name == "Wind":
         return _of.bg_relic_ANEMO.copy()
@@ -60,7 +60,7 @@ async def max_lvl(x):
     elif x == 1:
         max = 30
     elif x == 2:
-        max = 40 
+        max = 40
     elif x == 3:
         max = 50
     elif x == 4:
@@ -69,7 +69,7 @@ async def max_lvl(x):
         max = 70
     else:
         max = 80
-    
+
     return max
 
 
@@ -90,7 +90,7 @@ async def get_quality_color(rank):
         return (0, 0, 255, 255)  # Ярко-синий цвет (Bright Blue)
     else:
         return (128, 128, 128, 255)  # Серый цвет (Gray)
-    
+
 
 async def get_eff_color(rank):
     if rank == 4:
@@ -100,7 +100,7 @@ async def get_eff_color(rank):
     elif rank == 2:
         return (248, 113, 113, 255)
     elif rank == 1:
-        return (161, 98, 7, 255) 
+        return (161, 98, 7, 255)
     else:
         return (128, 128, 128, 255)
 
@@ -141,7 +141,7 @@ class Creat:
         self.img = img
         self.hide = hide
         self.uid = uid
-    
+
 
     async def creat_name_banner(self):
         background_name = Image.new("RGBA", (335,113), (0,0,0,0))
@@ -202,7 +202,7 @@ class Creat:
         else:
             bg = await pill.creat_bg_teample_two(self.character.portrait,bg, _of.MASKA_ART.convert("L"))
         return bg
-    
+
     async def creat_lc(self):
         bg_new = Image.new("RGBA", (192, 268), (0, 0, 0, 0))
         frame = Image.new("RGBA", (424, 268), (0, 0, 0, 0))
@@ -265,13 +265,13 @@ class Creat:
         bg_r = Image.new("RGBA", (261,198), (0,0,0,0))
         icon_rel = await pill.get_dowload_img(relics.icon, size=(180, 179))
         bg_r.alpha_composite(icon_rel,(0,1))
-        
+
         icon = await pill.get_dowload_img(relics.main_affix.icon, size=(36, 36))
         display = relics.main_affix.display
         level = f"+{relics.level}"
         stars = await get_stars_icon(relics.rarity)
         stars = stars.resize((89,25))
-        
+
         bg_two.paste(bg_r, (0,0),_of.relic_mask.convert("L"))
         bg.alpha_composite(bg_two, (0,0))
         bg.alpha_composite(icon, (202, 7))
@@ -298,7 +298,7 @@ class Creat:
         await asyncio.gather(*tasks)
 
         score, rank, eff = await calculators.get_rating(relics,self.character.id,str(relics.id[-1:]))
-        
+
         rank_bg = _of.rank.copy()
         color = await get_quality_color(rank)
         color_eff = await get_eff_color(eff)
@@ -327,7 +327,7 @@ class Creat:
             else:
                 dop[field] = {"main": attribute.display, "dop": 0}
                 combined_attributes[field] = attribute
-                
+
         dop = {key: value for key, value in dop.items() if value['dop'] != 0}
         position_icon = [
             (0,0), (200,0),
@@ -351,7 +351,7 @@ class Creat:
             icon = await pill.get_dowload_img(stat.icon, size=(128, 128))
             bg.alpha_composite(icon,(0,0))
             bg = bg.resize((46,46))
-            
+
             bg_new.alpha_composite(bg,position_icon[i])
 
             value = "{:.1f}%".format(stat.value * 100) if stat.percent else round(stat.value)
@@ -368,7 +368,7 @@ class Creat:
             else:
                 x = position_text - int(font.getlength(str(value)))
                 d.text((x, position_icon[i][1]), str(value), font=font, fill=(255, 255, 255, 255))
-            
+
             if position_text == 143:
                 position_text = 342
             else:
@@ -405,14 +405,14 @@ class Creat:
         for _, image in enumerate(images):
             combined.alpha_composite(image.resize((367,69)), pos[_])
         return combined
- 
+
     async def create_set_image(self, set_data, font):
         frame = _of.sets_relic.copy()
         d = ImageDraw.Draw(frame)
-        d.text((393, 21), str(set_data["num"]), font=font, fill=(110, 249, 123, 255)) 
+        d.text((393, 21), str(set_data["num"]), font=font, fill=(110, 249, 123, 255))
         sets_name_font,size = await pill.get_text_size_frame(set_data["name"],15,272)
-        
-        d.text((int(215-size/2), 27), set_data["name"], font=sets_name_font, fill=(110, 249, 123, 255))  
+
+        d.text((int(215-size/2), 27), set_data["name"], font=sets_name_font, fill=(110, 249, 123, 255))
         icon = await pill.get_dowload_img(set_data["icon"], size=(78, 78))
         frame.alpha_composite(icon, (0,0))
         return frame
@@ -448,11 +448,11 @@ class Creat:
                 count = _of.path_count.copy()
                 draw = ImageDraw.Draw(count)
                 draw.text((6,-5), f"{key.level}/{key.max_level}", font=font, fill=(255, 255, 255, 255))
-                bg.alpha_composite(icon, position[key.anchor]["icon"]) 
+                bg.alpha_composite(icon, position[key.anchor]["icon"])
                 if "count" in  position[key.anchor]:
-                    bg.alpha_composite(count, position[key.anchor]["count"]) 
+                    bg.alpha_composite(count, position[key.anchor]["count"])
 
-        return bg      
+        return bg
 
     async def create_skill_icon(self, bg, skill, position):
         count = _of.count_talants.copy()
@@ -474,7 +474,7 @@ class Creat:
 
     async def create_dop_stats_icon(self, bg_full, key, res, position, y):
         data_dop = []
-        
+
         for keys in self.character.skill_trees:
             if str(keys.id) in res:
                 data_dop.append(keys.icon)
@@ -556,7 +556,7 @@ class Creat:
         d.text((250, -6), rank, font=font, fill=color)
         d.text((374, -6), str(total_eff), font=font, fill=color_eff)
         d.text((627, -6), str(round(total_score, 2)), font=font, fill=color)
-        uid_text = f"UID: HIDDEN" if self.hide else f"UID: {self.uid}"
+        uid_text = "UID: HIDDEN" if self.hide else f"UID: {self.uid}"
         d = ImageDraw.Draw(bg_two)
         d.text((25, 715), uid_text, font=font, fill=(255, 255, 255, 255))
         bg_two.alpha_composite(total_stats_frame, (59, 4))

@@ -1,0 +1,15 @@
+{
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "pylint.args": [
+        "--max-line-length=120",
+        "--indent-string='    '",
+        "--disable=C0103",
+        "--disable=bare-except",
+        "--disable=W0237",
+        "--disable=unsubscriptable-object",
+        "--disable=assignment-from-none",
+        "--disable=missing-function-docstring",
+        "--disable=missing-module-docstring"
+    ]
+}
