@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='starrailcard',
-    version='1.3.0k',
+    version='1.3.0.011',
     description='Module for generating Honkai Star Rail character cards',
     author='None',
     packages=find_packages(),
