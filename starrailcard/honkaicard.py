@@ -19,13 +19,13 @@ def process_input(characterImgs, characterName,characterBackground):
         else:
             raise TypeError("The characterBackground parameter must be a dictionary, where the key is the name of the character, and the parameter is an image.\nExample: charterImg = {'Himeko': 'img.png'} or {'Himeko': 'img.png', 'Seele': 'img2.jpg', ...}")
 
-    
+
     if characterName:
         if isinstance(characterName, str):
             characterName = [name.strip().lower() for name in characterName.split(",")]
         else:
             raise TypeError("The name parameter must be a string, to pass multiple names, list them separated by commas.\nExample: name = 'Himeko' or name = 'Himeko, Seele',..")
-    
+
     return characterImgs, characterName,characterBackground
 
 
@@ -54,12 +54,12 @@ class MiHoMoCard():
         :param seeleland: bool, Get information from the site: seeleland.com (Only for 3 patterns).
         :param font: str, Name or path to the font file to replace.
 
-        """        
+        """
         self.font = font
         self.template = template
         self.backgroundBlur = backgroundBlur
-        
-        
+
+
         if not int(template) in [1,2,3,4,5]:
             self.template = 3
 
@@ -67,10 +67,10 @@ class MiHoMoCard():
             self.lang = "en"
         else:
             self.lang = lang
-        
+
         self.translateLang = translation.Translator(lang)
         self.background = background
-        
+
         try:
             self.characterImgs, self.characterName,self.characterBackground = process_input(characterImgs, characterName,characterBackground)
         except Exception as e:
@@ -90,25 +90,25 @@ class MiHoMoCard():
 
     async def __aexit__(self, *args):
         pass
-    
+
     async def get_characterBackgroundImg(self,name,ids):
         if name in self.characterBackground:
             self.characterBackgroundimg = await pill.get_user_image(self.characterBackground[name])
         else:
             self.characterBackgroundimg = None
-        
+
         if ids in self.characterBackground:
             self.characterBackgroundimg = await pill.get_user_image(self.characterBackground[ids])
-        
+
     async def characterImg(self,name,ids):
         if name in self.characterImgs:
             self.img = await pill.get_user_image(self.characterImgs[name])
         else:
             self.img = None
-        
+
         if ids in self.characterImgs:
             self.img = await pill.get_user_image(self.characterImgs[ids])
-    
+
     async def creat(self, uid):
         if self.font is None:
             if self.template == 4:
@@ -136,15 +136,15 @@ class MiHoMoCard():
             "id": "",
         }
 
-        
+
         for key in data.characters:
-            
+
             user["name"] += f"{key.name}, "
             user["id"] += f"{key.id}, "
-            
+
             if self.characterName:
                 if not key.name.lower() in self.characterName and not str(key.id) in self.characterName:
-                    continue       
+                    continue
 
             if self.characterImgs:
                 await self.characterImg(key.name.lower(), str(key.id))
@@ -173,12 +173,12 @@ class MiHoMoCard():
                 await saveBanner(uid,keys["card"], keys["name"])
 
         return modal.HSRCard(**user)
-    
+
     async def get_profile(self, uid, banner = None, card = False):
         data = await self.API.get_full_data(uid)
         if not self.font is None:
             await openFile.change_font(self.lang, font_path = self.font)
-            
+
         user = {
             "settings": {
                 "uid": int(uid),
@@ -189,6 +189,7 @@ class MiHoMoCard():
             },
             "player": data.player,
             "card": None,
+            "cards": None,
             "name": "",
             "id": "",
         }
@@ -200,7 +201,7 @@ class MiHoMoCard():
             if not banner is None:
                 banner = await pill.get_user_image(banner)
             user["card"] = await profile.Creat(data, self.translateLang, banner, self.hide).start()
-            
+
 
         return modal.HSRCard(**user)
 
@@ -246,7 +247,7 @@ class MiHoMoCard():
 
             for key in result["relict"]:
                 card_bg.alpha_composite(key.card, positione[key.position-1])
-            
+
             result["card"] = card_bg
 
         return modal.StarRailRelict(**result)
@@ -290,9 +291,9 @@ class MiHoMoCard():
                 position = (1356,609)
 
         card.alpha_composite(author_icon,position)
-        
+
         return card
-            
+
 
 class StarRaillScore:
     def __init__(self, chart_id, relict) -> None:
@@ -300,13 +301,13 @@ class StarRaillScore:
         :param chart_id: int, Character id
         :param relict: class, the object you get from the method: get_relict()
         """
-        
+
         if relict == []:
             raise TypeError("Doesn't accept lists. Only 1 relic")
-        
+
         if not relict.position:
             raise TypeError("Pass an object of the RelictData class, you can get it using the method: get_relict()")
-        
+
         self.relict = relict
         self.chart_id = chart_id
 
