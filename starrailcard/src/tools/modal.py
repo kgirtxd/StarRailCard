@@ -3,6 +3,7 @@
 
 from pydantic import BaseModel
 from typing import List ,Optional,Union
+from honkairail.src.tools.modalV2 import PlayerV2
 
 from PIL import Image
 
@@ -17,15 +18,16 @@ class SpaceInfo(BaseModel):
     avatar_count: Optional[int]
     achievement_count: Optional[int]
 
-class PlayerV2(BaseModel):
-    uid: Optional[str]
-    nickname: Optional[str]
-    level: Optional[int]
-    avatar: Avatar
-    signature: Optional[str]
-    friend_count: Optional[int]
-    world_level: Optional[int]
-    space_info: SpaceInfo
+# class PlayerV2(BaseModel):
+#     uid: Optional[str]
+#     nickname: Optional[str]
+#     level: Optional[int]
+#     world_level: Optional[int]
+#     friend_count: Optional[int]
+#     avatar: Optional[Avatar]
+#     signature: Optional[str]
+#     is_display: Optional[bool]
+#     space_info: Optional[SpaceInfo]
 
 
 
@@ -47,7 +49,7 @@ class Settings(BaseModel):
 class HSRCard(BaseModel):
     settings: Settings
     player: PlayerV2
-    card: Optional[Union[List[Card], Image.Image]] 
+    card: Optional[Union[List[Card], Image.Image]]
     cards: Optional[Image.Image]
     name: Optional[str]
     id: Optional[str]
@@ -102,7 +104,7 @@ class RelictData(BaseModel):
 
 class StarRailRelict(BaseModel):
     uid: Optional[int]
-    card: Image.Image 
+    card: Image.Image
     charter_id: Optional[int]
     relict: Optional[List[RelictData]]
 

@@ -1,34 +1,43 @@
 # Copyright 2024 DEViantUa <t.me/deviant_ua>
 # All rights reserved.
 import asyncio
+from typing import Tuple
 from PIL import ImageDraw,Image,ImageFilter,ImageChops
+from pydantic import BaseModel
+from honkairail.src.tools.modalV2 import CharacterData
+
+from starrailcard.src.tools import translation
 from ..tools import calculators, pill, openFile, treePaths
 from ..tools.calculator import stats
 _of = openFile.ImageCache()
 
 
-_DEFAULT_SCORE = {'count': 0,
-                  'rolls': {},
-                  'rank': {'name': 'N/A',
-                           'color': (255, 255, 255, 255)
-                    }
+_DEFAULT_SCORE = {
+    'count': 0,
+    'rolls': {},
+    'rank': {'name': 'N/A',
+            'color': (255, 255, 255, 255)
+    }
 }
 
-async def bg_element(name):
-    if name == "Wind":
-        return _of.bg_wind.copy()
-    if name == "Fire":
-        return _of.bg_fire.copy()
-    if name == "Ice":
-        return _of.bg_ice.copy()
-    if name == "Thunder":
-        return _of.bg_electro.copy()
-    if name == "Quantum":
-        return _of.bg_quantom.copy()
-    if name == "Imaginary":
-        return _of.bg_imaginary.copy()
-    else:
-        return _of.bg_psyhical.copy()
+def get_bg(name):
+    match name:
+        case "Wind":
+            return _of.bg_wind.copy()
+        case "Fire":
+            return _of.bg_fire.copy()
+        case "Ice":
+            return _of.bg_ice.copy()
+        case "Thunder":
+            return _of.bg_electro.copy()
+        case "Quantum":
+            return _of.bg_quantom.copy()
+        case "Imaginary":
+            return _of.bg_imaginary.copy()
+        case "Physical":
+            return _of.bg_psyhical.copy()
+        case _:
+            return _of.bg_psyhical.copy()
 
 color_scoreR = {
     4: (255, 200, 91, 255),
@@ -56,28 +65,32 @@ color_element = {
 }
 
 async def get_background_path(path):
-    if path == "Rogue":
-        return _of.Rogue.copy()
-    elif path == "Knight":
-        return _of.Knight.copy()
-    elif path == "Mage":
-        return _of.Mage.copy()
-    elif path == "Priest":
-        return _of.Priest.copy()
-    elif path == "Shaman":
-        return _of.Shaman.copy()
-    elif path == "Warlock":
-        return _of.Warlock.copy()
-    else:
-        return _of.Warrior.copy()
+    match path:
+        case "Rogue":
+            return _of.Rogue.copy()
+        case "Knight":
+            return _of.Knight.copy()
+        case "Mage":
+            return _of.Mage.copy()
+        case "Priest":
+            return _of.Priest.copy()
+        case "Shaman":
+            return _of.Shaman.copy()
+        case "Warlock":
+            return _of.Warlock.copy()
+        case "Warrior":
+            return _of.Warrior.copy()
+        case _:
+            return None  # return a default value if no cases match
 
 async def get_cone_frame(x):
-    if x == 5:
-        return _of.light_cone_frame_five
-    elif x == 4:
-        return _of.light_cone_frame_four
-    else:
-        return _of.light_cone_frame_three
+    match x:
+        case 5:
+            return _of.light_cone_frame_five
+        case 4:
+            return _of.light_cone_frame_four
+        case _:
+            return _of.light_cone_frame_three
 
 color_lc_line = {
     "3": (150, 202, 255, 255),
@@ -86,51 +99,61 @@ color_lc_line = {
 }
 
 async def max_lvl(x):
-    if x == 0:
-        max = 20
-    elif x == 1:
-        max = 30
-    elif x == 2:
-        max = 40
-    elif x == 3:
-        max = 50
-    elif x == 4:
-        max = 60
-    elif x == 5:
-        max = 70
-    else:
-        max = 80
-
-    return max
+    match x:
+        case 0:
+            lv = 20
+        case 1:
+            lv = 30
+        case 2:
+            lv = 40
+        case 3:
+            lv = 50
+        case 4:
+            lv = 60
+        case 5:
+            lv = 70
+        case _:
+            lv = 80
+    return lv
 
 async def ups(x):
-    if x == 5:
-        return "V"
-    elif x == 4:
-        return "IV"
-    elif x == 3:
-        return "III"
-    elif x == 2:
-        return "II"
-    elif x == 1:
-        return "I"
-    else:
-        return "O"
+    match x:
+        case 5:
+            return "V"
+        case 4:
+            return "IV"
+        case 3:
+            return "III"
+        case 2:
+            return "II"
+        case 1:
+            return "I"
+        case _:
+            return "O"
 
 async def get_stars(x):
-    if x == 5:
-        return _of.g_five
-    elif x == 4:
-        return _of.g_four
-    elif x == 3:
-        return _of.g_three
-    elif x == 2:
-        return _of.g_two
-    else:
-        return _of.g_one
+    match x:
+        case 5:
+            return _of.g_five
+        case 4:
+            return _of.g_four
+        case 3:
+            return _of.g_three
+        case 2:
+            return _of.g_two
+        case _:
+            return _of.g_one
 
 class Creat:
-    def __init__(self,characters, lang,img,hide,uid,seeleland) -> None:
+    def __init__(
+            self,
+            characters:CharacterData,
+            lang=translation.Translator('en'),
+            img=None,
+            hide=False,
+            uid=None,
+            seeleland=False
+    ) -> None:
         self.character = characters
         self.lang = lang
         self.img = img
@@ -139,6 +162,19 @@ class Creat:
         self.totall_eff = 0
         self.seeleland = seeleland
         self.element_color = self.character.element.color.rgba
+
+        self.background = None
+        self.background_light_cones = None
+        self.background_name = None
+        self.background_stats = None
+        self.background_score = None
+        self.background_sets = None
+        self.background_relict = None
+        self.background_path = None
+        self.background_skills = None
+        self.score_info = None
+        self.seelelen = None
+        self.relict = None
 
     async def creat_bacground(self):
         self.background = Image.new("RGBA",(1920,782), (0,0,0,0))
@@ -318,7 +354,7 @@ class Creat:
 
         main_stat_icon = await pill.get_dowload_img(relict.main_affix.icon, size=(48, 48))
         color = color_element.get(relict.main_affix.type, None)
-        if not color is None:
+        if color is not None:
             main_stat_icon = await pill.recolor_image(main_stat_icon, color[:3])
         stars = await get_stars(relict.rarity)
 
@@ -564,7 +600,7 @@ class Creat:
             if data is None:
                 self.seelelen = Image.new("RGBA",(1,1), (0,0,0,0))
                 return None
-            if not "rank" in data:
+            if "rank" not in data:
                 self.seelelen = Image.new("RGBA",(1,1), (0,0,0,0))
                 return None
             draw = ImageDraw.Draw(self.seelelen)
@@ -579,18 +615,20 @@ class Creat:
         self.background = cropped_image
 
     async def start(self):
+        print(f"Starting card for {self.character.name} with id {self.character.id}")
         if self.img:
             self.element_color = await  pill.get_background_colors(self.img, 15, common=True, radius=5, quality=800)
 
-        await asyncio.gather(self.creat_bacground(),
-                             self.creat_light_cone(),
-                             self.creat_name(),
-                             self.creat_stats(),
-                             self.creat_relict_sets(),
-                             self.creat_constant(),
-                             self.creat_path(),
-                             self.get_score(),
-                             self.creat_seeleland()
+        await asyncio.gather(
+            self.creat_bacground(),
+            self.creat_light_cone(),
+            self.creat_name(),
+            self.creat_stats(),
+            self.creat_relict_sets(),
+            self.creat_constant(),
+            self.creat_path(),
+            self.get_score(),
+            self.creat_seeleland()
         )
 
         self.score_info = await stats.Calculator(self.character).start()
@@ -610,6 +648,5 @@ class Creat:
             "card": self.background,
             "size": self.background.size
         }
-
+        print(f"Made card for {self.character.name} with id {self.character.id}")
         return data
-
